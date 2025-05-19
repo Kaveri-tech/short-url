@@ -1,0 +1,40 @@
+*How This Works in the App Flow
+User logs in:
+
+    1.They submit login form → POST /user/login
+
+    2.Controller verifies credentials → If valid:
+
+        Creates a unique session ID (UUID)  
+
+        Calls setUser(sessionId, user) to store session
+
+        Sends cookie "uid" with that session ID to the client
+
+    3.User’s browser stores cookie "uid".
+
+*User requests protected routes:
+
+    1.Browser sends request with cookie "uid".
+
+    2.Middleware restrictToLoggedinUserOnly runs:
+
+        Extracts session ID from cookie
+
+        Calls getUser(sessionId)
+
+        If found, attaches user info to req.user
+
+        Otherwise redirects to /login
+
+    3.Protected route handler can access logged-in user via req.user.
+
+*User requests public routes (like homepage or login page):
+
+    1.Middleware checkAuth runs:
+
+        Tries to get user from session cookie (if any)
+
+        Attaches user info or null to req.user
+
+    2.Route handlers can check if user is logged in and render accordingly.
